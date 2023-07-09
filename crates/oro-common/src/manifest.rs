@@ -432,6 +432,46 @@ mod tests {
     }
 
     #[test]
+    fn boolean_bundled_dependencies() -> Result<()> {
+        let string = r#"
+{
+    "name": "hello",
+    "description": "description",
+    "homepage": "https://foo.dev",
+    "license": "Parity-7.0",
+    "main": "index.js",
+    "keywords": ["foo", "bar"],
+    "files": ["*.js"],
+    "os": ["windows", "darwin"],
+    "cpu": ["x64"],
+    "bundleDependencies": false,
+    "workspaces": [
+        "packages/*"
+    ]
+}
+        "#;
+        let parsed = serde_json::from_str::<Manifest>(string).into_diagnostic()?;
+        assert_eq!(
+            parsed,
+            ManifestBuilder::default()
+                .name("hello")
+                .description("description")
+                .homepage("https://foo.dev")
+                .license("Parity-7.0")
+                .main("index.js")
+                .keywords(vec!["foo".into(), "bar".into()])
+                .files(Some(vec!["*.js".into()]))
+                .os(vec!["windows".into(), "darwin".into()])
+                .cpu(vec!["x64".into()])
+                .bundled_dependencies(vec![])
+                .workspaces(vec!["packages/*".into()])
+                .build()
+                .unwrap()
+        );
+        Ok(())
+    }
+
+    #[test]
     fn array_engines() -> Result<()> {
         let string = r#"
 {
